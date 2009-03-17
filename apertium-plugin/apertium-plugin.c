@@ -11,12 +11,12 @@ gboolean apertium_dbus_init()
 	conn = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
 	
 	if (conn == NULL) {
-		g_warning("Hata %s\n", error->message);
+		g_warning("Error %s\n", error->message);
 		return FALSE;
 	}
 	else
 	{
-		g_debug("conn %d\n", conn);
+		g_debug("conn object is %d\n", conn);
 	}
 
 	proxy = dbus_g_proxy_new_for_name_owner(conn,
