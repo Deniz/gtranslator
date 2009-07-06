@@ -51,16 +51,13 @@ highlight_unknown_text(GtkTextBuffer *buffer)
 {
 	GtkTextIter start_iter;
 	GtkTextIter match_start, match_end;
-	GtkTextTag *text_tag
 	gint offset;
 	
-	if (text_tag == NULL)
-		text_tag = gtk_text_buffer_create_tag(buffer,
-											  "unknown_text",
-											  "foreground",
-											  "red",
-											   NULL);
-											   
+	GtkTextTag *text_tag = gtk_text_buffer_create_tag(buffer,
+													  "unknown_text",
+													  "foreground",
+													  "red",
+													  NULL);
 	gtk_text_buffer_get_start_iter(buffer, &start_iter);
 	
 	while(gtk_text_iter_forward_search(&start_iter,
