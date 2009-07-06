@@ -163,7 +163,8 @@ apertium_dbus_translate(const gchar* given_string, gboolean mark_unknown, Custom
 		g_hash_table_insert(hash, "mark_unknown", "false");
 	}
 	unicode = g_utf8_validate(given_string, -1, &valid_end);
-		if (unicode == FALSE)
+	
+	if (unicode == FALSE)
 		g_print("End of valid data : %s \n", valid_end);
 	else
 		g_print("New Original string : %s \n", given_string);
