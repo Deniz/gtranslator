@@ -198,6 +198,7 @@ apertium_translate(GtkButton* button, gpointer user_data)
 	
 	client = gconf_client_get_default();
 	mark_unknown = gconf_client_get_bool(client, APERTIUM_MARK_UNKNOWN, NULL);
+	g_object_unref(client);
 	
 	original_buffer = gtk_text_view_get_buffer(priv->original);
 	gtk_text_buffer_get_start_iter (original_buffer, &start);
