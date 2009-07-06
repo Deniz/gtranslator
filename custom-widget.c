@@ -209,6 +209,8 @@ apertium_translate(GtkButton* button, gpointer user_data)
 static void
 custom_widget_init (CustomWidget *object)
 {
+	g_print("custom_widget_init\n");
+	/* TODO: Add initialization code here */
 	gboolean result = apertium_dbus_init();
 	
 	CustomWidgetPriv* priv = GET_PRIV(object);
