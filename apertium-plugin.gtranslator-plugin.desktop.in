@@ -1,6 +1,6 @@
 [Gtranslator Plugin]
-Module=apertium
-IAge=7
+Module=apertiumplugin
+IAge=2
 _Name=Apertium
 _Description=Hebele Hubele.
 Icon=apertium

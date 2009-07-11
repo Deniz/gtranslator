@@ -24,23 +24,24 @@ G_DEFINE_TYPE (GtrApertiumConfDlg, gtr_apertium_conf_dlg, GTK_TYPE_DIALOG);
 static DBusGProxy *proxy = NULL;
 
 typedef struct {
-	GtkTable *table;
-	GtkComboBox *lang_pair;
-	GtkCheckButton *mark_unknown;
-	GtkButton *color_selection;
+	GtkWidget *table;
+	GtkWidget *lang_pair;
+	GtkWidget *mark_unknown;
+	GtkWidget *color_selection;
 	GtkWidget *frame;
+	GConfClient *gconf_client;
 	gchar **pairs;
 } GtrApertiumConfDlgPriv;
 
 #define GET_PRIV(object) G_TYPE_INSTANCE_GET_PRIVATE(object, GTR_TYPE_APERTIUM_CONF_DLG, GtrApertiumConfDlgPriv)
 
-apertium_dbus_init()
+gboolean apertium_dbus_init()
 {
 	DBusGConnection *conn = NULL;
 	GError *error = NULL;
 	
 	conn = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
-	
+	/*
 	if (conn == NULL) {
 		g_warning("Hata %s\n", error->message);
 		return FALSE;
@@ -49,7 +50,7 @@ apertium_dbus_init()
 	{
 		g_debug("conn %d\n", conn);
 	}
-
+	*/
 	proxy = dbus_g_proxy_new_for_name_owner(conn,
 											APERTIUM_INFO_SERVICE_NAME,
 											APERTIUM_INFO_OBJECT_PATH,
@@ -57,7 +58,6 @@ apertium_dbus_init()
 											&error);
 	g_return_val_if_fail(proxy != NULL, FALSE);	
 	
-	g_debug("proxy %d\n", proxy);
 	return TRUE;
 }
 
@@ -83,7 +83,6 @@ on_dialog_ok_cb(GtkDialog *dialog, guint response, gpointer user_data)
 	GConfClient *client = NULL;
 	
 	GtrApertiumConfDlgPriv *priv = GET_PRIV(dialog);
-	client = gconf_client_get_default();
 	
 	switch (response)
 	{
@@ -91,12 +90,12 @@ on_dialog_ok_cb(GtkDialog *dialog, guint response, gpointer user_data)
 		{
 			if (client != NULL)
 			{
-				gconf_client_set_string(client, APERTIUM_LANG_PAIR, gtk_combo_box_get_active_text(priv->lang_pair), NULL);
-				gconf_client_set_bool(client, APERTIUM_MARK_UNKNOWN, gtk_toggle_button_get_active(priv->mark_unknown), NULL);
+				gconf_client_set_string(priv->gconf_client, APERTIUM_LANG_PAIR, gtk_combo_box_get_active_text(GTK_COMBO_BOX(priv->lang_pair)), NULL);
+				gconf_client_set_bool(priv->gconf_client, APERTIUM_MARK_UNKNOWN, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->mark_unknown)), NULL);
 				//gconf_client_set_string(client, APERTIUM_HIGHLIGHT_COLOR, gtk_combo_box_get_active_text(priv->lang_pair), NULL);
 				g_object_unref(client);
 			}
-			gtk_widget_destroy(dialog);
+			gtk_widget_destroy(GTK_WIDGET(dialog));
 		}
 	}
 }
@@ -110,16 +109,16 @@ get_color_selection(GtkDialog *dialog, guint response, gpointer user_data)
 	{
 		case GTK_RESPONSE_OK:
 		{
-			GtkWidget *color = gtk_color_selection_dialog_get_color_selection(dialog);
+			GtkWidget *color = gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(dialog));
 			gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color), &current_color);
-			gtk_widget_destroy(dialog);
-			g_print("#%d%d%d%d\n", current_color.red, current_color.green, current_color.blue);
+			gtk_widget_destroy(GTK_WIDGET(dialog));
+			//g_print("#%d%d%d%d\n", current_color.red, current_color.green, current_color.blue);
 		}
 		break;
 		
 		case GTK_RESPONSE_CANCEL:
 		{
-			gtk_widget_destroy(dialog);
+			gtk_widget_destroy(GTK_WIDGET(dialog));
 		}
 	}
 }
@@ -137,9 +136,9 @@ on_color_selection_clicked(GtkButton *button, gpointer user_data)
 }
 
 GtkWidget*
-gtr_apertium_conf_dlg_new()
+gtr_apertium_conf_dlg_new(void)
 {
-  	return GTR_APERTIUM_CONF_DLG(g_object_new(GTR_TYPE_APERTIUM_CONF_DLG, NULL));
+  	return GTK_WIDGET(g_object_new(GTR_TYPE_APERTIUM_CONF_DLG, NULL));
 }
 
 static void
@@ -151,10 +150,8 @@ gtr_apertium_conf_dlg_init (GtrApertiumConfDlg *object)
 	guint i;
 	gboolean mark_unknown;
 	gchar *lang_pair;
-	GConfClient *client;
 
-	client = gconf_client_get_default();
-	g_print("gclient\n");
+	priv->gconf_client = gconf_client_get_default();
 	get_available_pairs(priv);
 	
 	priv->frame = gtk_frame_new(C_("Dialog frame", "Configuration Dialog"));
@@ -167,7 +164,7 @@ gtr_apertium_conf_dlg_init (GtrApertiumConfDlg *object)
 	
 	for (i = 0; priv->pairs[i] != NULL; i++)
 	{
-		gtk_combo_box_append_text(priv->lang_pair, priv->pairs[i]);
+		gtk_combo_box_append_text(GTK_COMBO_BOX(priv->lang_pair), priv->pairs[i]);
 	}
 	
 	label = gtk_label_new(C_("Languages", "Select a pair"));
@@ -177,13 +174,12 @@ gtr_apertium_conf_dlg_init (GtrApertiumConfDlg *object)
 	label = gtk_label_new(C_("Color Selection", "Select Highlight color"));
 	gtk_table_attach(GTK_TABLE(priv->table), label, 0, 1, 2, 3, GTK_EXPAND, GTK_EXPAND, 0, 0);
 	
-	mark_unknown = gconf_client_get_bool(client, APERTIUM_MARK_UNKNOWN, NULL);
-	lang_pair = gconf_client_get_string(client, APERTIUM_LANG_PAIR, NULL);
+	mark_unknown = gconf_client_get_bool(priv->gconf_client, APERTIUM_MARK_UNKNOWN, NULL);
+	lang_pair = gconf_client_get_string(priv->gconf_client, APERTIUM_LANG_PAIR, NULL);
+	
 	if (mark_unknown != NULL)
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(priv->mark_unknown), mark_unknown);
-	g_object_unref(client);
 	
-	g_print("%s %d\n", lang_pair, mark_unknown);
 			
 	gtk_table_attach(GTK_TABLE(priv->table), priv->lang_pair, 1, 2, 0, 1, GTK_EXPAND, GTK_EXPAND, 0, 0);
 	gtk_table_attach(GTK_TABLE(priv->table), priv->mark_unknown, 1, 2, 1, 2, GTK_EXPAND, GTK_EXPAND, 0, 0);
@@ -192,7 +188,7 @@ gtr_apertium_conf_dlg_init (GtrApertiumConfDlg *object)
 	gtk_container_add(GTK_CONTAINER(priv->frame), priv->table);	
 	gtk_container_add(GTK_CONTAINER(content_area), priv->frame);
 	
-	gtk_dialog_add_button(object, GTK_STOCK_OK, 55);
+	gtk_dialog_add_button(GTK_DIALOG(object), GTK_STOCK_OK, 55);
 	g_signal_connect(G_OBJECT(object), "response", G_CALLBACK(on_dialog_ok_cb), NULL);
 }
 
@@ -200,7 +196,10 @@ static void
 gtr_apertium_conf_dlg_finalize (GObject *object)
 {
 	GtrApertiumConfDlgPriv *priv = GET_PRIV(object);
+	
 	g_strfreev(priv->pairs);
+	g_object_unref(priv->gconf_client);
+	
 	G_OBJECT_CLASS (gtr_apertium_conf_dlg_parent_class)->finalize (object);
 }
 
@@ -208,10 +207,10 @@ static void
 gtr_apertium_conf_dlg_class_init (GtrApertiumConfDlgClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
-	GtkDialogClass* parent_class = GTK_DIALOG_CLASS (klass);
+	//GtkDialogClass* parent_class = GTK_DIALOG_CLASS (klass);
 
 	object_class->finalize = gtr_apertium_conf_dlg_finalize;
-	
+
 	g_type_class_add_private(klass, sizeof(GtrApertiumConfDlgPriv));
 }
 

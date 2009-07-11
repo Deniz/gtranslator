@@ -45,7 +45,7 @@ struct _GtranslatorApertiumPlugin
 	GtranslatorPlugin parent_instance;
 };
 
-GType gtranslator_apertium_plugin_register_type   (GTypeModule * module);
+G_MODULE_EXPORT GType register_gtranslator_plugin (GTypeModule *module);
 GType gtranslator_apertium_plugin_get_type (void) G_GNUC_CONST;
 
 G_END_DECLS

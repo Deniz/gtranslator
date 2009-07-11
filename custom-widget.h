@@ -46,6 +46,7 @@ struct _CustomWidget
 };
 
 GType custom_widget_get_type (void) G_GNUC_CONST;
+GType custom_widget_register_type (GTypeModule * module);
 GtkWidget* custom_widget_new();
 
 G_END_DECLS

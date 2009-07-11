@@ -20,8 +20,9 @@
 #include "custom-widget.h"
 #include "apertium-plugin.h"
 #include "gtr-apertium-conf-dlg.h"
+#include "plugin.h"
 
-G_DEFINE_TYPE (CustomWidget, custom_widget, GTK_TYPE_HBOX);
+GTR_PLUGIN_DEFINE_TYPE  (CustomWidget, custom_widget, GTK_TYPE_HBOX);
 
 static DBusGProxy *proxy = NULL;
 
@@ -45,6 +46,18 @@ show_dlg(GtkButton* button, gpointer user_data)
 	gtk_widget_show_all(dlg);
 }
 
+static void
+show_dbus_error(const char* error)
+{
+	GtkWidget* dialog= gtk_message_dialog_new(NULL,
+									   GTK_DIALOG_MODAL,
+									   GTK_MESSAGE_ERROR,
+									   GTK_BUTTONS_OK,
+									   error);
+	
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);								   
+}
 
 static void
 highlight_unknown_text(GtkTextBuffer *buffer)
@@ -105,7 +118,6 @@ on_translate_end(DBusGProxy *proxy,
 						  &translated_string,
 						  G_TYPE_INVALID);
 	
-	g_print("Async translated string : %s\n", translated_string);
 	update_translation_text(translated_string, priv);			  
 	highlight_unknown_text(gtk_text_view_get_buffer(priv->translation));
 	if (translated_string != NULL)
@@ -121,22 +133,18 @@ apertium_dbus_init()
 	conn = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
 	
 	if (conn == NULL) {
-		g_warning("Hata %s\n", error->message);
 		return FALSE;
 	}
-	else
-	{
-		g_debug("conn %d\n", conn);
-	}
+
 
 	proxy = dbus_g_proxy_new_for_name_owner(conn,
 											APERTIUM_SERVICE_NAME,
 											APERTIUM_OBJECT_PATH,
 											APERTIUM_INTERFACE,
 											&error);
+											
 	g_return_val_if_fail(proxy != NULL, FALSE);	
-	
-	g_debug("proxy %d\n", proxy);
+
 	return TRUE;
 }
 
@@ -159,12 +167,7 @@ apertium_dbus_translate(const gchar* given_string, gboolean mark_unknown, Custom
 	{
 		g_hash_table_insert(hash, "mark_unknown", "false");
 	}
-	unicode = g_utf8_validate(given_string, -1, &valid_end);
-		if (unicode == FALSE)
-		g_print("End of valid data : %s \n", valid_end);
-	else
-		g_print("New Original string : %s \n", given_string);
-		
+
 	dbus_g_proxy_begin_call(proxy, 
 							"translate", 
 							(DBusGProxyCallNotify) on_translate_end,
@@ -212,6 +215,9 @@ custom_widget_init (CustomWidget *object)
 	g_print("custom_widget_init\n");
 	/* TODO: Add initialization code here */
 	gboolean result = apertium_dbus_init();
+	
+	if (result == FALSE)
+		show_dbus_error("Unable to connect DBus service");
 	
 	CustomWidgetPriv* priv = GET_PRIV(object);
 	priv->original = gtk_text_view_new();

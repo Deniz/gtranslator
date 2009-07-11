@@ -22,6 +22,7 @@
 #endif
 
 #include "gtranslator-apertium-plugin.h"
+#include "gtr-apertium-conf-dlg.h"
 #include "custom-widget.h"
 #include "application.h"
 #include "window.h"
@@ -38,8 +39,30 @@
 //G_DEFINE_TYPE (GtranslatorApertiumPlugin, gtranslator_apertium_plugin, GTRANSLATOR_TYPE_PLUGIN);
 
 GTR_PLUGIN_REGISTER_TYPE_WITH_CODE (GtranslatorApertiumPlugin, gtranslator_apertium_plugin,
-		gtranslator_apertium_register_type (module);
+		custom_widget_register_type (module);
 )
+
+static GtkWidget*
+impl_create_configure_dialog(GtranslatorPlugin *plugin)
+{
+	GtkWidget *dialog;
+	
+	dialog = gtr_apertium_conf_dlg_new();
+	/*
+	g_signal_connect (dialog,
+			  "response",
+			  G_CALLBACK (configure_dialog_response_cb),
+			  GTR_OPEN_TRAN_PLUGIN (plugin));
+	
+	
+	g_signal_connect (dialog,
+			  "destroy",
+			  G_CALLBACK (gtk_widget_destroy),
+			  &dialog);
+	*/
+	return dialog;
+}
+
 		
 static void
 impl_activate(GtranslatorPlugin *plugin,
@@ -102,6 +125,7 @@ gtranslator_apertium_plugin_class_init (GtranslatorApertiumPluginClass *klass)
 	
 	parent_class->activate = impl_activate;
 	parent_class->deactivate = impl_deactivate;
+	//parent_class->create_configure_dialog = impl_create_configure_dialog;
 	
 	object_class->finalize = gtranslator_apertium_plugin_finalize;
 }

@@ -9,7 +9,7 @@ INCLUDES =                                                      \
 	-DPIXMAPSDIR=\""$(datadir)"/pixmaps/gtranslator\"       \
 	-DDATADIR=\""$(pkgdatadir)"\"                           \
 	$(GTRANSLATOR_CFLAGS) 				\
-	$(SOUP_CFLAGS)				\
+	$(APERTIUM_CFLAGS)				\
 	$(WARN_CFLAGS)					\
 	$(DISABLE_DEPRECATED_CFLAGS)			\
 	-DGTR_LOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\"

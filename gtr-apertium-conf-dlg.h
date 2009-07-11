@@ -54,7 +54,7 @@ struct _GtrApertiumConfDlg
 };
 
 GType gtr_apertium_conf_dlg_get_type (void) G_GNUC_CONST;
-GtkWidget* gtr_apertium_conf_dlg_new();
+GtkWidget* gtr_apertium_conf_dlg_new(void);
 
 G_END_DECLS
 
