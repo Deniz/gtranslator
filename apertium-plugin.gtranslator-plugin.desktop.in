@@ -1,0 +1,9 @@
+[Gtranslator Plugin]
+Module=apertium
+IAge=7
+_Name=Apertium
+_Description=Hebele Hubele.
+Icon=apertium
+Authors=Deniz Koçak <deniz.kocak@gmail.com>
+Copyright=Copyright @ 2009 Deniz Koçak
+Website=http://gtranslator.sf.net

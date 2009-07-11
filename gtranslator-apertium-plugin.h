@@ -21,6 +21,7 @@
 #define _GTRANSLATOR_APERTIUM_PLUGIN_H_
 
 #include <glib-object.h>
+#include "plugin.h"
 
 G_BEGIN_DECLS
 
@@ -44,6 +45,7 @@ struct _GtranslatorApertiumPlugin
 	GtranslatorPlugin parent_instance;
 };
 
+GType gtranslator_apertium_plugin_register_type   (GTypeModule * module);
 GType gtranslator_apertium_plugin_get_type (void) G_GNUC_CONST;
 
 G_END_DECLS
