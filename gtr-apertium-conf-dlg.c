@@ -129,7 +129,7 @@ on_color_selection_clicked(GtkButton *button, gpointer user_data)
 	GtkWidget *selection;
 	GtkWidget *color_button;
 	
-	selection = gtk_color_selection_dialog_new("Bir renk seçin");
+	selection = gtk_color_selection_dialog_new(C_("Please pick a color", "Color selection"));
 	g_signal_connect(G_OBJECT(selection), "response", G_CALLBACK(get_color_selection), NULL);
 	
 	gtk_widget_show(selection);
@@ -158,7 +158,7 @@ gtr_apertium_conf_dlg_init (GtrApertiumConfDlg *object)
 	priv->table = gtk_table_new(3, 2, TRUE);
 	priv->lang_pair = gtk_combo_box_new_text();
 	priv->mark_unknown = gtk_check_button_new();
-	priv->color_selection = gtk_button_new_with_label("Select a Color");
+	priv->color_selection = gtk_button_new_with_label(C_("Select a Color", "Color select button"));
 	
 	g_signal_connect(G_OBJECT(priv->color_selection), "clicked", G_CALLBACK(on_color_selection_clicked), NULL);
 	

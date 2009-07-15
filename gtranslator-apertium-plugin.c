@@ -36,8 +36,6 @@
 
 #define WINDOW_DATA_KEY	"GtranslatorApertiumPluginWindowData"
 
-//G_DEFINE_TYPE (GtranslatorApertiumPlugin, gtranslator_apertium_plugin, GTRANSLATOR_TYPE_PLUGIN);
-
 GTR_PLUGIN_REGISTER_TYPE_WITH_CODE (GtranslatorApertiumPlugin, gtranslator_apertium_plugin,
 		custom_widget_register_type (module);
 )

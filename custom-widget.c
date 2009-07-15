@@ -212,18 +212,17 @@ apertium_translate(GtkButton* button, gpointer user_data)
 static void
 custom_widget_init (CustomWidget *object)
 {
-	g_print("custom_widget_init\n");
-	/* TODO: Add initialization code here */
+	
 	gboolean result = apertium_dbus_init();
 	
 	if (result == FALSE)
-		show_dbus_error("Unable to connect DBus service");
+		show_dbus_error(C_("Unable to connect DBus service", "DBus error message"));
 	
 	CustomWidgetPriv* priv = GET_PRIV(object);
 	priv->original = gtk_text_view_new();
 	priv->translation = gtk_text_view_new();
-	priv->button = gtk_button_new_with_label("Deneme");
-	priv->conf_dlg = gtk_button_new_with_label("Ayar");
+	priv->button = gtk_button_new_with_label(C_("Translate", "Translate button"));
+	priv->conf_dlg = gtk_button_new_with_label(C_("Settings", "Settings button"));
 	priv->vbox = gtk_vbox_new(FALSE, 5);
 	priv->hbox = gtk_hbox_new(TRUE, 5);
 	
@@ -245,9 +244,7 @@ custom_widget_init (CustomWidget *object)
 static void
 custom_widget_finalize (GObject *object)
 {
-	g_print("custom_widget_finalize\n");
-	/* TODO: Add deinitalization code here */
-	
+
 	G_OBJECT_CLASS (custom_widget_parent_class)->finalize (object);
 }
 
